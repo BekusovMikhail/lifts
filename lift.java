@@ -98,6 +98,9 @@ class Lift extends Thread {
         }
     }
 
+    public int getLocation(){
+        return this.location;
+    }
 
 
     public void run() {
