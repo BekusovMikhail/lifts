@@ -69,11 +69,19 @@ public class Main extends Application {
                 }
             }
 
-            ArrayList<Rectangle> prerectangles = new ArrayList<>();
+//            ArrayList<Rectangle> prerectangles = new ArrayList<>();
+//
+//            public void setPrerectangles() {
+//                for (int h = 0; h < m; h++) {
+//                    prerectangles.add(new Rectangle(k * 100, this.n * 70, 70, 70));
+//                }
+//            }
 
-            public void setPrerectangles(){
-                for (int h = 0; h<m; h++){
-                    prerectangles.add(new Rectangle(k * 100, this.n * 70, 70, 70));
+            ArrayList<Integer> locations = new ArrayList<>();
+
+            public void setLocations() {
+                for (int h = 0; h < m; h++) {
+                    locations.add(0);
                 }
             }
 
@@ -82,7 +90,8 @@ public class Main extends Application {
 
                 if (this.counter == -1) {
                     settings();
-                    setPrerectangles();
+//                    setPrerectangles();
+                    setLocations();
                 }
 
                 Random rand = new Random();
@@ -172,37 +181,37 @@ public class Main extends Application {
                 ArrayList<Rectangle> rectangles = new ArrayList<>();
                 ArrayList<TranslateTransition> translateTransitions = new ArrayList<>();
 
+                for (int a = 0; a < m; a++) {
+                    rectangles.add(new Rectangle(a * 100, this.n * 70 - this.locations.get(a) * 70, 70, 70));
+                    rectangles.get(a).setFill(Color.BLUE);
+                    translateTransitions.add(new TranslateTransition(Duration.millis(1000)));
+                    translateTransitions.get(a).setNode(rectangles.get(a));
+                    translateTransitions.get(a).setByY(this.n * 70 - lifts.get(a).getLocation() * 70);
+                    translateTransitions.get(a).setCycleCount(50);
+                    translateTransitions.get(a).setAutoReverse(false);
+                    translateTransitions.get(a).play();
+                }
+
                 Group rectanGroup = new Group();
 
-                for (int k = 0; k < m; k++) {
-                    rectangles.add(new Rectangle(k * 100, this.n * 70 - lifts.get(k).getLocation() * 80, 70, 70));
-                    rectangles.get(k).setFill(Color.BLUE);
+                for (int a = 0; a < m; a++) {
+                    rectanGroup.getChildren().add(rectangles.get(a));
                 }
 
-                for (int k = 0; k < m; k++) {
-                    translateTransitions.add(new TranslateTransition());
-                    translateTransitions.get(k).setDuration(Duration.millis(1000));
-                    translateTransitions.get(k).setNode(prerectangles.get(k));
-                    translateTransitions.get(k).setByY(this.n * 70 - lifts.get(k).getLocation()*80);
-                    translateTransitions.get(k).setCycleCount(50);
-                    translateTransitions.get(k).setAutoReverse(false);
-                    translateTransitions.get(k).play();
-                    rectanGroup.getChildren().add(this.prerectangles.get(k));
-                }
-
-
-
-                Scene scene1 = new Scene(rectanGroup);
+                Scene scene1 = new Scene(rectanGroup, this.m*100, this.n*80);
                 stage.setScene(scene1);
 
                 stage.show();
                 timeline.play();
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(200);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                this.prerectangles = rectangles;
+
+                for (int u = 0; u < m; u++) {
+                    locations.set(u, lifts.get(u).getLocation());
+                }
 
             }
         }.start();
