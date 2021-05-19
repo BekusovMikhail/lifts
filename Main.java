@@ -1,5 +1,6 @@
 import javafx.animation.AnimationTimer;
 import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -7,6 +8,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,16 +32,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
-        Random rand = new Random();
-        stage.setHeight(rand.nextInt(700));
-        Text text = new Text("Hello from JavaFX!");
-        text.setLayoutY(80);
-        text.setLayoutX(100);
 
-        Group group = new Group(text);
-
-        Scene scene = new Scene(group);
-        stage.setScene(scene);
         stage.setTitle("Lifts");
 
 
@@ -76,11 +69,20 @@ public class Main extends Application {
                 }
             }
 
+            ArrayList<Rectangle> prerectangles = new ArrayList<>();
+
+            public void setPrerectangles(){
+                for (int h = 0; h<m; h++){
+                    prerectangles.add(new Rectangle(k * 100, this.n * 70, 70, 70));
+                }
+            }
+
             @Override
             public void handle(long l) {
 
                 if (this.counter == -1) {
                     settings();
+                    setPrerectangles();
                 }
 
                 Random rand = new Random();
@@ -165,15 +167,27 @@ public class Main extends Application {
                     }
                 }
                 stage.setWidth(this.m * 100);
-                stage.setHeight(this.n * 100);
+                stage.setHeight(this.n * 80);
 
                 ArrayList<Rectangle> rectangles = new ArrayList<>();
+                ArrayList<TranslateTransition> translateTransitions = new ArrayList<>();
+
                 Group rectanGroup = new Group();
 
                 for (int k = 0; k < m; k++) {
-                    rectangles.add(new Rectangle(k * 100, lifts.get(k).getLocation()*100, 70, 80));
+                    rectangles.add(new Rectangle(k * 100, this.n * 70 - lifts.get(k).getLocation() * 80, 70, 70));
                     rectangles.get(k).setFill(Color.BLUE);
-                    rectanGroup.getChildren().add(rectangles.get(k));
+                }
+
+                for (int k = 0; k < m; k++) {
+                    translateTransitions.add(new TranslateTransition());
+                    translateTransitions.get(k).setDuration(Duration.millis(1000));
+                    translateTransitions.get(k).setNode(prerectangles.get(k));
+                    translateTransitions.get(k).setByY(this.n * 70 - lifts.get(k).getLocation()*80);
+                    translateTransitions.get(k).setCycleCount(50);
+                    translateTransitions.get(k).setAutoReverse(false);
+                    translateTransitions.get(k).play();
+                    rectanGroup.getChildren().add(this.prerectangles.get(k));
                 }
 
 
@@ -188,6 +202,7 @@ public class Main extends Application {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                this.prerectangles = rectangles;
 
             }
         }.start();

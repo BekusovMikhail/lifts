@@ -98,7 +98,7 @@ class Lift extends Thread {
         }
     }
 
-    public int getLocation(){
+    public int getLocation() {
         return this.location;
     }
 
@@ -109,7 +109,7 @@ class Lift extends Thread {
             try {
                 this.tmp_floor = this.exc_floor.exchange(new AtomicInteger());
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println("Exchange error");
             }
             try {
                 this.tmp_direction = this.exc_dir.exchange(new AtomicBoolean());
@@ -124,9 +124,12 @@ class Lift extends Thread {
                 System.out.println("Exchange error");
             }
 
+//            this.exc_floor.exchange(new AtomicInteger(this.location));
+
             this.move();
             this.unloading();
             this.loading();
+
         }
     }
 }
