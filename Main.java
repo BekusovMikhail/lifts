@@ -6,12 +6,10 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Exchanger;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -23,10 +21,6 @@ public class Main extends Application {
 
     public static void main(String[] args) throws InterruptedException {
         launch(args);
-    }
-
-    public void draw(Stage stage) {
-        stage.show();
     }
 
     @Override
@@ -69,14 +63,6 @@ public class Main extends Application {
                 }
             }
 
-//            ArrayList<Rectangle> prerectangles = new ArrayList<>();
-//
-//            public void setPrerectangles() {
-//                for (int h = 0; h < m; h++) {
-//                    prerectangles.add(new Rectangle(k * 100, this.n * 70, 70, 70));
-//                }
-//            }
-
             ArrayList<Integer> locations = new ArrayList<>();
 
             public void setLocations() {
@@ -90,7 +76,6 @@ public class Main extends Application {
 
                 if (this.counter == -1) {
                     settings();
-//                    setPrerectangles();
                     setLocations();
                 }
 
@@ -204,7 +189,7 @@ public class Main extends Application {
                 stage.show();
                 timeline.play();
                 try {
-                    Thread.sleep(200);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -215,9 +200,6 @@ public class Main extends Application {
 
             }
         }.start();
-
-
-//        Platform.exit();
 
     }
 }
