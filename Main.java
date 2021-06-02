@@ -1,23 +1,34 @@
-import javafx.animation.AnimationTimer;
-import javafx.animation.Timeline;
-import javafx.animation.TranslateTransition;
+import javafx.animation.*;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.Exchanger;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Main extends Application {
     private static Object Random;
+
+    final int n = 10;
+    final int m = 3;
+    final int k = 6;
+    final int max_people = k;
+    final int people_freq = 2;
+
+    ArrayList<Rectangle> rectangles = new ArrayList<>();
 
     public static void main(String[] args) throws InterruptedException {
         launch(args);
@@ -26,19 +37,31 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
+        for (int a = 0; a < m; a++) {
+            rectangles.add(new Rectangle(a * 100, n * 70, 70, 70));
+            rectangles.get(a).setFill(Color.BLUE);
+        }
 
         stage.setTitle("Lifts");
 
+        Group rectanGroup = new Group();
 
-        Timeline timeline = new Timeline(500);
+        for (int a = 0; a < m; a++) {
+            rectanGroup.getChildren().add(rectangles.get(a));
+        }
+
+        Scene scene1 = new Scene(rectanGroup, this.m * 100, this.n * 80);
+        stage.setScene(scene1);
+
+        stage.setWidth(m * 100);
+        stage.setHeight(n * 80);
+
+        stage.show();
+
+        Timeline timeline = new Timeline();
 
         new AnimationTimer() {
 
-            final int n = 10;
-            final int m = 3;
-            final int k = 6;
-            final int max_people = k;
-            final int people_freq = 2;
             int counter = -1;
 
             ArrayList<Lift> lifts = new ArrayList<Lift>();
@@ -73,7 +96,6 @@ public class Main extends Application {
 
             @Override
             public void handle(long l) {
-
                 if (this.counter == -1) {
                     settings();
                     setLocations();
@@ -160,44 +182,49 @@ public class Main extends Application {
                         }
                     }
                 }
-                stage.setWidth(this.m * 100);
-                stage.setHeight(this.n * 80);
 
-                ArrayList<Rectangle> rectangles = new ArrayList<>();
-                ArrayList<TranslateTransition> translateTransitions = new ArrayList<>();
-
-                for (int a = 0; a < m; a++) {
-                    rectangles.add(new Rectangle(a * 100, this.n * 70 - this.locations.get(a) * 70, 70, 70));
-                    rectangles.get(a).setFill(Color.BLUE);
-                    translateTransitions.add(new TranslateTransition(Duration.millis(1000)));
-                    translateTransitions.get(a).setNode(rectangles.get(a));
-                    translateTransitions.get(a).setByY(this.n * 70 - lifts.get(a).getLocation() * 70);
-                    translateTransitions.get(a).setCycleCount(50);
-                    translateTransitions.get(a).setAutoReverse(false);
-                    translateTransitions.get(a).play();
-                }
-
-                Group rectanGroup = new Group();
+//                ArrayList<TranslateTransition> translateTransitions = new ArrayList<>();
+//                TranslateTransition tt = new TranslateTransition();
+//                rectangles.get(0).setY(0);
+//                tt.setFromY(n*70 - locations.get(0)*75);
+//                tt.setNode(rectangles.get(0));
+//                System.out.println(n*70 - locations.get(0)*75);
+//                System.out.println((locations.get(0)-lifts.get(0).getLocation())*75);
+//                tt.setByY(10);
+//                tt.setToY((locations.get(0)-lifts.get(0).getLocation())*75);
+//                tt.setDuration(Duration.millis(5000));
+//                tt.play();
 
                 for (int a = 0; a < m; a++) {
-                    rectanGroup.getChildren().add(rectangles.get(a));
+//                    final Node node = rectangles.get(a);
+//                    node.setTranslateY(-lifts.get(a).getLocation() * 75);
+                    rectangles.get(a).setTranslateY(n * 70 - locations.get(a) * 75);
+                    KeyValue kv = new KeyValue(rectangles.get(a).yProperty(), (locations.get(a) - lifts.get(a).getLocation()) * 75);
+                    KeyFrame kf = new KeyFrame(Duration.millis(1000), kv);
+
+                    timeline.getKeyFrames().add(kf);
                 }
 
-                Scene scene1 = new Scene(rectanGroup, this.m*100, this.n*80);
-                stage.setScene(scene1);
-
-                stage.show();
+                timeline.setCycleCount(1);
+                timeline.setRate(1000);
+                System.out.println(timeline.getStatus());
                 timeline.play();
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+//                while (true) {
+//                    System.out.println(timeline.getStatus());
+//                    if (timeline.getStatus() == Animation.Status.STOPPED) {
+//                        System.out.println(timeline.getStatus());
+//                        break;
+//                    }
+//                }
+                System.out.println(timeline.getStatus());
+
+//                PauseTransition p = new PauseTransition(Duration.millis(1000));
+//                p.setOnFinished(e->timeline.play());
 
                 for (int u = 0; u < m; u++) {
                     locations.set(u, lifts.get(u).getLocation());
                 }
-
+                System.out.println(timeline.getStatus());
             }
         }.start();
 
