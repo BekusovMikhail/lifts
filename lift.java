@@ -102,6 +102,10 @@ class Lift extends Thread {
         return this.location;
     }
 
+    public int getNumOfPeople() {
+        return floors_for_unloading.size();
+    }
+
 
     public void run() {
         while (true) {

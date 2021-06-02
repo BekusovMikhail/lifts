@@ -1,20 +1,18 @@
 import javafx.animation.*;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.Exchanger;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,9 +24,11 @@ public class Main extends Application {
     final int m = 3;
     final int k = 6;
     final int max_people = k;
-    final int people_freq = 2;
+    final int people_freq = 1;
+    final int animationSpeedMs = 2000;
 
     ArrayList<Rectangle> rectangles = new ArrayList<>();
+    ArrayList<Text> people_counters = new ArrayList<>();
 
     public static void main(String[] args) throws InterruptedException {
         launch(args);
@@ -38,27 +38,45 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
 
         for (int a = 0; a < m; a++) {
-            rectangles.add(new Rectangle(a * 100, n * 70, 70, 70));
+            rectangles.add(new Rectangle(a * 90 + 60, (n - 1) * 80, 70, 80));
+            rectangles.get(a).setStyle("-fx-stroke: black; -fx-stroke-width: 3;");
             rectangles.get(a).setFill(Color.BLUE);
+            Text tmptext = new Text(a * 90 + 29 + 60, (n - 1) * 80 + 45 + 60, "0");
+            tmptext.setFill(Color.RED);
+            tmptext.setStyle("-fx-font-size: 24; -fx-text-alignment: center");
+            people_counters.add(tmptext);
+        }
+
+        Group rectanGroup = new Group();
+
+        for (int a = 0; a < n; a++) {
+            Text tmptext = new Text(20, (a) * 80 + 45, Integer.toString(n - a));
+            tmptext.setFill(Color.GREEN);
+            tmptext.setStyle("-fx-font-size: 24; -fx-text-alignment: center");
+            rectanGroup.getChildren().add(tmptext);
+        }
+
+
+        for (int a = 0; a < m; a++) {
+            Line tmpline = new Line(a * 90 + 35 + 60, 0, a * 90 + 35 + 60, n * 80);
+            rectanGroup.getChildren().add(tmpline);
+        }
+
+        for (int a = 0; a < m; a++) {
+            rectanGroup.getChildren().add(rectangles.get(a));
+            rectanGroup.getChildren().add(people_counters.get(a));
+
         }
 
         stage.setTitle("Lifts");
 
-        Group rectanGroup = new Group();
-
-        for (int a = 0; a < m; a++) {
-            rectanGroup.getChildren().add(rectangles.get(a));
-        }
-
-        Scene scene1 = new Scene(rectanGroup, this.m * 100, this.n * 80);
+        Scene scene1 = new Scene(rectanGroup, this.m * 90 + 60, this.n * 80);
         stage.setScene(scene1);
 
-        stage.setWidth(m * 100);
-        stage.setHeight(n * 80);
+        stage.setWidth(m * 90 + 60);
+        stage.setHeight(n * 80 + 40);
 
         stage.show();
-
-        Timeline timeline = new Timeline();
 
         new AnimationTimer() {
 
@@ -94,12 +112,18 @@ public class Main extends Application {
                 }
             }
 
+            long prev_time = 0;
+
             @Override
             public void handle(long l) {
                 if (this.counter == -1) {
                     settings();
                     setLocations();
                 }
+                if ((l - prev_time) < animationSpeedMs * 1000000) {
+                    return;
+                }
+                prev_time = l;
 
                 Random rand = new Random();
                 counter += 1;
@@ -139,7 +163,7 @@ public class Main extends Application {
                         }
                     }
                 } else {
-//                System.out.println(requests.size());
+
                     for (int request = 0; request < requests.size(); request++) {
                         for (int i = 0; i < lifts.size(); i++) {
                             try {
@@ -183,48 +207,32 @@ public class Main extends Application {
                     }
                 }
 
-//                ArrayList<TranslateTransition> translateTransitions = new ArrayList<>();
-//                TranslateTransition tt = new TranslateTransition();
-//                rectangles.get(0).setY(0);
-//                tt.setFromY(n*70 - locations.get(0)*75);
-//                tt.setNode(rectangles.get(0));
-//                System.out.println(n*70 - locations.get(0)*75);
-//                System.out.println((locations.get(0)-lifts.get(0).getLocation())*75);
-//                tt.setByY(10);
-//                tt.setToY((locations.get(0)-lifts.get(0).getLocation())*75);
-//                tt.setDuration(Duration.millis(5000));
-//                tt.play();
-
                 for (int a = 0; a < m; a++) {
-//                    final Node node = rectangles.get(a);
-//                    node.setTranslateY(-lifts.get(a).getLocation() * 75);
-                    rectangles.get(a).setTranslateY(n * 70 - locations.get(a) * 75);
-                    KeyValue kv = new KeyValue(rectangles.get(a).yProperty(), (locations.get(a) - lifts.get(a).getLocation()) * 75);
-                    KeyFrame kf = new KeyFrame(Duration.millis(1000), kv);
-
-                    timeline.getKeyFrames().add(kf);
+                    TranslateTransition tt = new TranslateTransition();
+                    rectangles.get(a).setY(0);
+                    tt.setFromY((n - 1 - locations.get(a)) * 80);
+                    tt.setNode(rectangles.get(a));
+                    tt.setToY((n - 1 - lifts.get(a).getLocation()) * 80);
+                    tt.setDuration(Duration.millis(animationSpeedMs));
+                    tt.play();
                 }
 
-                timeline.setCycleCount(1);
-                timeline.setRate(1000);
-                System.out.println(timeline.getStatus());
-                timeline.play();
-//                while (true) {
-//                    System.out.println(timeline.getStatus());
-//                    if (timeline.getStatus() == Animation.Status.STOPPED) {
-//                        System.out.println(timeline.getStatus());
-//                        break;
-//                    }
-//                }
-                System.out.println(timeline.getStatus());
-
-//                PauseTransition p = new PauseTransition(Duration.millis(1000));
-//                p.setOnFinished(e->timeline.play());
+                for (int a = 0; a < m; a++) {
+//                    Text tmptext = new Text(a * 90 + 29, (n - 1) * 80 + 45, "0");
+                    people_counters.get(a).setText(Integer.toString(lifts.get(a).getNumOfPeople()));
+                    TranslateTransition tt = new TranslateTransition();
+                    people_counters.get(a).setY(0);
+                    tt.setFromY((n - 1 - locations.get(a)) * 80 + 45);
+                    tt.setNode(people_counters.get(a));
+                    tt.setToY((n - 1 - lifts.get(a).getLocation()) * 80 + 45);
+                    tt.setDuration(Duration.millis(animationSpeedMs));
+                    tt.play();
+                }
 
                 for (int u = 0; u < m; u++) {
                     locations.set(u, lifts.get(u).getLocation());
                 }
-                System.out.println(timeline.getStatus());
+
             }
         }.start();
 
