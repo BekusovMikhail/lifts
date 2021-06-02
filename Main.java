@@ -6,7 +6,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -25,7 +24,7 @@ public class Main extends Application {
     final int k = 6;
     final int max_people = k;
     final int people_freq = 1;
-    final int animationSpeedMs = 2000;
+    final int animationSpeedMs = 3000;
 
     ArrayList<Rectangle> rectangles = new ArrayList<>();
     ArrayList<Text> people_counters = new ArrayList<>();
@@ -120,7 +119,7 @@ public class Main extends Application {
                     settings();
                     setLocations();
                 }
-                if ((l - prev_time) < animationSpeedMs * 1000000) {
+                if ((l - prev_time) / 1000 < animationSpeedMs * 1000) {
                     return;
                 }
                 prev_time = l;
@@ -128,7 +127,7 @@ public class Main extends Application {
                 Random rand = new Random();
                 counter += 1;
                 if (counter == people_freq) {
-                    for (int f = 0; f < 3; f++) {
+                    for (int f = 0; f < 4; f++) {
                         AtomicInteger new_floor = new AtomicInteger();
                         new_floor.set(rand.nextInt(n));
                         AtomicBoolean direction = new AtomicBoolean();
