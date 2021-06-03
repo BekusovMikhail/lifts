@@ -17,7 +17,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Main extends Application {
-    private static Object Random;
 
     final int n = 10;
     final int m = 3;
@@ -124,7 +123,7 @@ public class Main extends Application {
                 }
                 prev_time = l;
 
-                Random rand = new Random();
+                Random rand = new Random(System.currentTimeMillis());
                 counter += 1;
                 if (counter == people_freq) {
                     for (int f = 0; f < 4; f++) {
@@ -217,7 +216,6 @@ public class Main extends Application {
                 }
 
                 for (int a = 0; a < m; a++) {
-//                    Text tmptext = new Text(a * 90 + 29, (n - 1) * 80 + 45, "0");
                     people_counters.get(a).setText(Integer.toString(lifts.get(a).getNumOfPeople()));
                     TranslateTransition tt = new TranslateTransition();
                     people_counters.get(a).setY(0);

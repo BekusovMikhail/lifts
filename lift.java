@@ -128,14 +128,9 @@ class Lift extends Thread {
                 System.out.println("Exchange error");
             }
 
-//            this.exc_floor.exchange(new AtomicInteger(this.location));
-
             this.move();
             this.unloading();
             this.loading();
-
         }
     }
 }
-
-
